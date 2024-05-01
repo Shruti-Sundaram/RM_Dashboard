@@ -3,7 +3,7 @@ pandas
 numpy
 matplotlib
 plotly
-sklearn
+scikit-learn
 plotly
 mplcyberpunk
 plotly
