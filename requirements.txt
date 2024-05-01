@@ -1,9 +1,9 @@
 streamlit
 pandas
 numpy
-matplotlib.pyplot
-plotly.graph_objects 
-sklearn.preprocessing
-plotly.express
+matplotlib
+plotly
+sklearn
+plotly
 mplcyberpunk
-plotly.io
+plotly
