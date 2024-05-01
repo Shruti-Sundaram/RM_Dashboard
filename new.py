@@ -10,82 +10,87 @@ import plotly.io as pio
 
 
 # function to display a Sankey diagram
-def display_sankey_diagram():
+def create_sankey_diagram():
     # Load the data
-    data = pd.read_csv("Results_21Mar2022.csv")
+    data = pd.read_csv('Results_21Mar2022.csv')
+
     # Convert relevant columns to category types
     data['sex'] = data['sex'].astype('category')
     data['diet_group'] = data['diet_group'].astype('category')
     data['age_group'] = data['age_group'].astype('category')
+
     # Calculate the weighted average of GHG emissions for each diet group
     weighted_mean_ghg = data.groupby('diet_group').apply(
         lambda x: (x['mean_ghgs'] * x['n_participants']).sum() / x['n_participants'].sum()
     ).reset_index(name='WeightedMeanGHG').sort_values('diet_group')
+
     # Calculate the sum of n_participants for each combination of gender and age group
     values_gender_to_age = data.groupby(['sex', 'age_group']).n_participants.sum().reset_index()
+
     # Calculate the sum of n_participants for each combination of age group and diet group
     values_age_to_diet = data.groupby(['age_group', 'diet_group']).n_participants.sum().reset_index()
+
     # Create lists for labels and colors for each node category
     gender_labels = ['Female', 'Male']
     age_labels = ['20-29', '30-39', '40-49', '50-59', '60-69', '70-79']
     diet_labels = ['fish', 'meat50', 'meat100', 'meat', 'vegan', 'veggie']
-    # Adding weighted mean GHG emissions to node titles for diet groups
-    diet_labels_with_ghg = [f"{label}\n(GHG: {round(ghg, 2)})" for label, ghg in zip(diet_labels, weighted_mean_ghg['WeightedMeanGHG'])]
-    # Updated labels with GHG information for diet groups
-    all_labels = gender_labels + age_labels + diet_labels_with_ghg
-    # Calculate the index offsets for gender, age, and diet labels
-    gender_offset = 0
-    age_offset = len(gender_labels)
-    diet_offset = age_offset + len(age_labels)
-    # Combine sources and targets using previously calculated offsets
-    sources = (
-        [i + gender_offset for i in range(len(gender_labels)) for _ in range(len(age_labels))] +
-        [i + age_offset for i in range(len(age_labels)) for _ in range(len(diet_labels))]
-    )
-    targets = (
-        [i + age_offset for _ in range(len(gender_labels)) for i in range(len(age_labels))] +
-        [i + diet_offset for _ in range(len(age_labels)) for i in range(len(diet_labels))]
-    )
-    # Combine values for the connections
-    values = list(values_gender_to_age['n_participants']) + list(values_age_to_diet['n_participants'])
-    # Define colors for genders and age groups
-    gender_colors = ['#f72585', '#3a0ca3']  # Colors for Female and Male, respectively
-    age_group_colors = ['#bbd0ff', '#b8c0ff', '#c8b6ff', '#e7c6ff', '#ffd6ff', '#f8edeb']  # Different shades of gray for age groups
-    # Define the diet node colors
-    diet_node_colors = [
-        "#7ed2cc",  # fish
+
+    # Colors for each category
+    gender_colors = ['#f72585', '#1982c4']
+    age_colors = ['#bbd0ff', '#b8c0ff', '#c8b6ff', '#e7c6ff', '#ffd6ff', '#ffb5a7']
+    diet_colors = ["#7ed2cc",  # fish
         "#cf364c",  # meat50
         "#9c0319",  # meat100
         "#c91d35",  # meat
         "#427343",  # vegan
-        "#73c875"   # veggie
-    ]
-    # Create a list of colors for the nodes
-    node_colors = gender_colors + age_group_colors + diet_node_colors
-    # Create a list of colors for the links
-    # Links from gender to age groups will have the same color as the gender
-    link_colors_gender_to_age = [gender_colors[0] for _ in values_gender_to_age['n_participants'][::2]] + \
-                            [gender_colors[1] for _ in values_gender_to_age['n_participants'][1::2]]
-    # Links from age groups to diet groups will have colors corresponding to the age groups
-    link_colors_age_to_diet = age_group_colors * len(diet_labels)
-    
-    # Combine the two lists of link colors
-    link_colors = link_colors_gender_to_age + link_colors_age_to_diet
-    # Update the 'color' attribute in both 'node' and 'link' dictionaries
+        "#73c875"]
+
+    # Combine all labels and colors for node setup
+    all_labels = gender_labels + age_labels + diet_labels
+    all_colors = gender_colors + age_colors + diet_colors
+
+    # Calculate the index offsets for gender, age, and diet labels
+    gender_offset = 0
+    age_offset = len(gender_labels)
+    diet_offset = age_offset + len(age_labels)
+
+    # Combine sources and targets using previously calculated offsets
+    sources = (
+        [i for i in range(gender_offset, age_offset) for _ in range(len(age_labels))] +
+        [i for i in range(age_offset, diet_offset) for _ in range(len(diet_labels))]
+    )
+    targets = (
+        [i for _ in range(len(gender_labels)) for i in range(age_offset, diet_offset)] +
+        [i for _ in range(len(age_labels)) for i in range(diet_offset, diet_offset + len(diet_labels))]
+    )
+
+    # Combine values for the connections
+    values = list(values_gender_to_age['n_participants']) + list(values_age_to_diet['n_participants'])
+
+    # Adding weighted mean GHG emissions to node titles for diet groups
+    diet_labels_with_ghg = [f"{label}\n(GHG: {round(ghg, 2)})" for label, ghg in zip(diet_labels, weighted_mean_ghg['WeightedMeanGHG'])]
+
+    # Updated labels with GHG information for diet groups
+    all_labels = gender_labels + age_labels + diet_labels_with_ghg
+
+    # Create a Sankey diagram
     fig = go.Figure(data=[go.Sankey(
         node=dict(
             pad=15,
             thickness=20,
-            line=dict(width=0.5),
+            line=dict(color="black", width=0.5),
             label=all_labels,
-            color=node_colors  # Updated node colors
+            color=all_colors  # assign the individual node colors
         ),
         link=dict(
             source=sources,
             target=targets,
             value=values,
-            color=link_colors  # Updated link colors
-        ))])   
+            color=[all_colors[source] for source in sources]  # assign link colors based on the source node
+        ))])
+
+    # Add title
+    fig.update_layout(title_text="Sankey Diagram: Participant Flow by Gender, Age, and Diet Groups with GHG Emissions")
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
