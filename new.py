@@ -8,6 +8,7 @@ import plotly.express as px
 import mplcyberpunk
 import plotly.io as pio
 
+
 # function to display a Sankey diagram
 def display_sankey_diagram():
     # Load the data
@@ -49,7 +50,7 @@ def display_sankey_diagram():
     values = list(values_gender_to_age['n_participants']) + list(values_age_to_diet['n_participants'])
     # Define colors for genders and age groups
     gender_colors = ['#f72585', '#3a0ca3']  # Colors for Female and Male, respectively
-    age_group_colors = ['#4cc9f0', '#4895ef', '#480ca8', '#7209b7', '#b5179e', '#c8b6ff']  # Different shades of gray for age groups
+    age_group_colors = ['#bbd0ff', '#b8c0ff', '#c8b6ff', '#e7c6ff', '#ffd6ff', '#f8edeb']  # Different shades of gray for age groups
     # Define the diet node colors
     diet_node_colors = [
         "#7ed2cc",  # fish
