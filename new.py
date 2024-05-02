@@ -213,7 +213,7 @@ def main():
 
     # First row with Sankey Diagram and Lollipop Chart
     with st.container():
-        col1, col2 = st.columns([2.5, 1.5])
+        col1, col2 = st.columns([2.2, 1.8])
         with col1:
             st.header(" ")
             st.markdown("<h3 style='text-align: center;'>Sankey Diagram of Participant Flows</h3>", unsafe_allow_html=True)
