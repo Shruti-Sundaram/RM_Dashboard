@@ -36,7 +36,7 @@ def create_sankey_diagram():
     diet_labels = ['fish', 'meat50', 'meat100', 'meat', 'vegan', 'veggie']
 
     # Colors for each category
-    gender_colors = ['#f72585', '#1982c4']
+    gender_colors = ['#ff8fab', '#1982c4']
     age_colors = ['#bbd0ff', '#b8c0ff', '#c8b6ff', '#e7c6ff', '#ffd6ff', '#ffb5a7']
     diet_colors = ["#7ed2cc",  # fish
         "#cf364c",  # meat50
@@ -88,9 +88,7 @@ def create_sankey_diagram():
             value=values,
             color=[all_colors[source] for source in sources]  # assign link colors based on the source node
         ))])
-
-    # Add title
-    fig.update_layout(title_text="Sankey Diagram: Participant Flow by Gender, Age, and Diet Groups with GHG Emissions")
+    
     # Display the plot in Streamlit
     st.plotly_chart(fig, use_container_width=True)
 
@@ -219,7 +217,7 @@ def main():
         with col1:
             st.header(" ")
             st.markdown("<h3 style='text-align: center;'>Sankey Diagram of Participant Flows</h3>", unsafe_allow_html=True)
-            display_sankey_diagram()
+            create_sankey_diagram()
         with col2:
             st.header(" ")
             st.markdown("<h3 style='text-align: center;'>3D Bubble Plot of Diet Groups</h3>", unsafe_allow_html=True)
@@ -227,10 +225,10 @@ def main():
 
     # Second row for full-width Bubble Map
     with st.container():
-        col1, col2 = st.columns([1.5, 2.5])
+        col1, col2 = st.columns([1.7, 2.3])
         with col1:
             st.header(" ")
-            st.markdown("<h3 style='text-align: center;'>Horizontal Lollipop Chart</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align: center;'>Horizontal Lollipop Chart ranking Foods</h3>", unsafe_allow_html=True)
             display_lollipop_chart()
         with col2:
             st.header(" ")
